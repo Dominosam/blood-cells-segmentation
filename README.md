@@ -53,6 +53,55 @@ To use this project, follow these steps:
 
 UNet is a type of convolutional neural network (CNN) developed primarily for biomedical image segmentation. Named 'UNet' due to its U-shaped structure, it was introduced by Olaf Ronneberger, Philipp Fischer, and Thomas Brox in their paper "U-Net: Convolutional Networks for Biomedical Image Segmentation."
 
+### Deep dive in UNet
+#### Contracting Path (Downsampling)
+1. Initial Convolution Blocks:
+
+- Each block consists of two 3x3 convolutions, each followed by a rectified linear unit (ReLU).
+- The first layer starts with a relatively small number of feature channels (e.g., 64), which is doubled with each subsequent downsampling step.
+- These convolutional layers extract features from the image at various levels of abstraction.
+
+2. Max Pooling:
+
+- After each convolution block, a 2x2 max pooling layer with stride 2 reduces the spatial dimensions of the feature maps.
+- This downsampling process increases the receptive field, allowing the network to capture more global information from the input image.
+
+3. Feature Channel Doubling:
+
+- As the network goes deeper, the number of feature channels doubles. This increment allows the network to learn more complex features at each level.
+- For instance, if the first layer has 64 channels, the next layer after pooling would have 128, and so on.
+  
+#### Bottleneck
+1. Transition between Downsampling and Upsampling:
+- The bottleneck is the part of the network with the smallest spatial dimensions.
+- It typically includes two 3x3 convolutions with ReLU activations and possibly a dropout layer.
+- This section processes the most abstract representations of the input data.
+
+
+#### Expanding Path (Upsampling)
+
+1. Upsampling:
+
+- The network symmetrically expands, starting from the bottleneck.
+- Upsampling (or up-convolution) is used to increase the spatial dimensions of the feature maps.
+- The number of feature channels is halved with each upsampling step.
+
+2. Concatenation with Corresponding Feature Maps:
+
+- After upsampling, the feature map is concatenated with the feature map from the corresponding level of the contracting path.
+- These skip connections provide high-resolution features to the expanding path, which helps in precise localization.
+
+3. Convolution Blocks after Concatenation:
+
+- Following each concatenation, there are two 3x3 convolutions, each followed by ReLU.
+- These convolutions process the combined features from both the contracting path and the upsampling path.
+
+#### Output Layer
+1. 1x1 Convolution:
+- The final layer of the network is a 1x1 convolution.
+- This layer is used to map the feature vectors to the desired number of classes for segmentation.
+- For binary segmentation, it typically has a single output channel. For multi-class segmentation, the number of output channels corresponds to the number of classes.
+
 ### Key Features of UNet
 
 1. **Symmetrical Design**: UNet's architecture consists of a contracting path and an expansive path, forming a U-shaped design. This structure captures context and enables precise localization.
